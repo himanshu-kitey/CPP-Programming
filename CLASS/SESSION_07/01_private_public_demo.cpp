@@ -21,7 +21,7 @@ int main(void)
     Date_2 myDate_2;
 
     myDate_1.month = 10; //Ok
-    myDate_2.month = 10; //Not Ok
+  //  myDate_2.month = 10; //Not Ok
 
     return 0;
 }
