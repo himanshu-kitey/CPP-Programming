@@ -1,0 +1,85 @@
+#include <stdio.h>
+
+// Global initialized data defination statement (Read/Write)
+int g_num_1 = 10;
+
+// Global uninitilized data defination statement (Read/Write)
+int g_num_2;
+
+// Global const data defination statement.
+// Data defination statement qualified by the keyword const must.
+// be initilized.
+
+const int c_num = 100;
+
+void test_1(void);
+void test_2(void);
+
+int main(void)
+{
+    test_1();
+    test_2();
+
+    return (0);
+}
+
+void test_1(void)
+{
+    g_num_1 = 1000;         // Ok
+    g_num_2 = 2000;         // Ok
+    // c_num = 200;         // Compile time error.
+                            // LHS must be a modifiable lvalue
+                            // c_num is an lvalue but not modifiable one
+                            // due to const qualifier.
+    // Inferenace : const variable cannot be modified accessing by name.
+
+    int* ptr = &c_num;      // Success in C
+                            // C compiler emits a warning that its discarding 
+                            // const qualifier but allows this assignment.
+    // *ptr = 200;          // Run-time error (segfault on Linux/MacOS)
+                            // Memory violation exception on windows.
+                            // Gloabal const variable goes to the read only
+                            // data section which is protected by H/W/.
+    
+}
+
+void test_2(void)
+{
+    // Define a read/write local variable.
+    // Such variable is semantically const.!
+    // Meaning that its constness will be preserved if one tries to
+    // access it by name, but pointer backdoowr will successed for it.
+    const int c_num_1 = 100;    // Compile time errror.
+                                // LHS must be modifiable lvalue.
+
+
+    // Create pointer back door.
+    int* ptr = &c_num_1;        // Compiler Warning: that its discarding a const.
+                                // qualifier for c_num_1
+    *ptr = 200;                 // This will work because the const qualifier has not
+                                // changed the storage section of c_num_1 which is a stack.
+                                // Stack is a read/write section. Therefore, this back-door works.
+                                // Talk about semantically const variable: -P.
+
+    static const int c_num_2 = 200;         
+                                            
+    //c_num_2 = 2000;                         // Compile time error.
+                                            // LHS must be modifiable value.
+
+ptr = &c_num_2;                 // Compiler warning: that its discarding a const
+                                // qualifier for c_num_2.
+
+
+// *ptr = 2000;                 // Run-time error (segfalut on linux/Macos)
+                                // Memory voilation exception on windows.
+                                // static const int c_num_2 = 2000;
+                                // const qualifier express a wish that this variable
+                                // be const. It will be semantically const at the very
+                                // least. But static keyword pushes memory allocation
+                                // of c_num_2 to a static section.
+                                // As read only data section is a static section, there
+                                // is an oppurtionity to make this varible H/W protected
+                                // const. C++ compiler cases the oppurnity and puts in 
+                                // rodata section, Therefore the run-time error.
+
+}
