@@ -83,3 +83,21 @@ ptr = &c_num_2;                 // Compiler warning: that its discarding a const
                                 // rodata section, Therefore the run-time error.
 
 }
+
+/*
+void test()
+{
+    int num1 = 10;  // Stack
+    int num2;       // Stack
+    const int num3 = 30;    //stack
+}
+
+
+void test()
+{
+    static int num1 = 10;       // data
+    static int num2;            // bss
+    static const int num3 = 20; //rodata
+
+}
+*/
